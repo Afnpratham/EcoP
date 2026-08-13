@@ -1,0 +1,120 @@
+{
+  "user": {
+    "id": "00000000-0000-4000-8000-000000000001",
+    "full_name": "Demo User",
+    "email": "demo@ecop.local",
+    "role": "student",
+    "sap_id": "DEMO-001",
+    "avatar_url": null,
+    "eco_points": 10,
+    "created_at": "2026-07-30T20:00:00.000Z"
+  },
+  "rewards": [
+    {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "name": "EcoP Sticker Pack",
+      "description": "A set of campus sustainability stickers.",
+      "cost_points": 20,
+      "stock": 25,
+      "image_url": null,
+      "active": true,
+      "created_at": "2026-07-30T20:00:00.000Z"
+    },
+    {
+      "id": "22222222-2222-4222-8222-222222222222",
+      "name": "Campus Coffee Voucher",
+      "description": "Redeem a free coffee at the campus cafe.",
+      "cost_points": 50,
+      "stock": 12,
+      "image_url": null,
+      "active": true,
+      "created_at": "2026-07-30T20:00:00.000Z"
+    },
+    {
+      "id": "33333333-3333-4333-8333-333333333333",
+      "name": "Reusable Bottle",
+      "description": "A reusable water bottle from the sustainability desk.",
+      "cost_points": 100,
+      "stock": 8,
+      "image_url": null,
+      "active": true,
+      "created_at": "2026-07-30T20:00:00.000Z"
+    }
+  ],
+  "sessions": [
+    {
+      "id": "3afdee55-f5ef-4e23-aaa0-bb1431671c65",
+      "user_id": "00000000-0000-4000-8000-000000000001",
+      "bin_id": "BIN-014",
+      "status": "verified",
+      "started_at": "2026-07-30T18:38:16.213Z",
+      "expires_at": "2026-07-30T18:43:16.213Z",
+      "verified_at": "2026-07-30T18:38:16.213Z",
+      "created_at": "2026-07-30T18:38:16.213Z"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "cb2bcedf-3bd2-4001-87af-4cc5a07da22c",
+      "user_id": "00000000-0000-4000-8000-000000000001",
+      "type": "earn",
+      "amount": 10,
+      "reference_id": "3afdee55-f5ef-4e23-aaa0-bb1431671c65",
+      "description": "Plastic bottle disposed correctly",
+      "created_at": "2026-07-30T18:38:16.213Z"
+    }
+  ],
+  "achievements": [
+    {
+      "id": "44444444-4444-4444-8444-444444444444",
+      "code": "FIRST_BOTTLE",
+      "name": "First Bottle",
+      "description": "Recycle your first plastic bottle.",
+      "icon": "Leaf",
+      "condition_type": "disposals",
+      "threshold": 1
+    },
+    {
+      "id": "55555555-5555-4555-8555-555555555555",
+      "code": "ECO_BEGINNER",
+      "name": "Eco Beginner",
+      "description": "Complete 5 verified disposals.",
+      "icon": "Award",
+      "condition_type": "disposals",
+      "threshold": 5
+    },
+    {
+      "id": "66666666-6666-4666-8666-666666666666",
+      "code": "POINT_PRO",
+      "name": "Point Pro",
+      "description": "Accumulate 100 Eco Points.",
+      "icon": "Star",
+      "condition_type": "points",
+      "threshold": 100
+    }
+  ],
+  "disposals": [
+    {
+      "id": "2d64e3d1-feec-43b2-936d-25a1172a4344",
+      "session_id": "3afdee55-f5ef-4e23-aaa0-bb1431671c65",
+      "user_id": "00000000-0000-4000-8000-000000000001",
+      "bin_id": "BIN-014",
+      "dustbin_id": "BIN-014",
+      "points_awarded": 10,
+      "verification_status": "verified",
+      "verification_payload": {
+        "confidence": 0.92,
+        "source": "awareness-engine",
+        "cycleId": null
+      },
+      "created_at": "2026-07-30T18:38:16.213Z"
+    }
+  ],
+  "redemptions": [],
+  "detectionLock": {
+    "locked": true,
+    "cycleId": "3afdee55-f5ef-4e23-aaa0-bb1431671c65",
+    "lockedAt": "2026-07-30T18:38:16.213Z",
+    "releaseAfter": "2026-07-30T18:38:20.213Z"
+  }
+}

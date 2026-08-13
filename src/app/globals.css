@@ -1,0 +1,148 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Brand primary: #22c55e -> HSL 142 71% 45% */
+    --primary: 142 71% 45%;
+    --primary-foreground: 0 0% 100%;
+
+    --background: 0 0% 100%;
+    --foreground: 160 9% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 160 9% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 160 9% 15%;
+
+    --secondary: 150 40% 97%;
+    --secondary-foreground: 150 30% 20%;
+
+    --muted: 150 20% 96%;
+    --muted-foreground: 150 8% 45%;
+
+    --accent: 140 50% 94%;
+    --accent-foreground: 150 40% 22%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+
+    --border: 150 15% 90%;
+    --input: 150 15% 90%;
+    --ring: 142 71% 45%;
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --primary: 142 71% 45%;
+    --primary-foreground: 0 0% 100%;
+
+    --background: 160 20% 7%;
+    --foreground: 150 20% 96%;
+
+    --card: 160 18% 10%;
+    --card-foreground: 150 20% 96%;
+
+    --popover: 160 18% 10%;
+    --popover-foreground: 150 20% 96%;
+
+    --secondary: 160 15% 14%;
+    --secondary-foreground: 150 20% 90%;
+
+    --muted: 160 12% 16%;
+    --muted-foreground: 150 10% 60%;
+
+    --accent: 160 30% 16%;
+    --accent-foreground: 142 60% 80%;
+
+    --destructive: 0 63% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 55%;
+    --warning-foreground: 0 0% 100%;
+
+    --border: 160 12% 20%;
+    --input: 160 12% 20%;
+    --ring: 142 71% 45%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  /* Respect reduced motion globally. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  /* Light-green radial gradients restricted to marketing surfaces. */
+  .marketing-radial {
+    background:
+      radial-gradient(60% 50% at 50% 0%, hsl(var(--primary) / 0.16), transparent 70%),
+      radial-gradient(40% 40% at 85% 20%, hsl(var(--primary) / 0.1), transparent 70%);
+  }
+
+  /* Subtle glassmorphism for hero + modal surfaces only. */
+  .glass {
+    background: hsl(var(--card) / 0.7);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+  }
+
+  .skeleton {
+    @apply relative overflow-hidden rounded-md bg-muted;
+  }
+  .skeleton::after {
+    content: "";
+    @apply absolute inset-0 -translate-x-full animate-shimmer;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      hsl(var(--foreground) / 0.06),
+      transparent
+    );
+  }
+
+  /* Hide scrollbar but keep functionality (used by horizontal pills). */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Shared easing curve for motion (see framer usage in components). */
+:root {
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
