@@ -44,18 +44,20 @@ export function NavbarUserMenu({
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-10 gap-2 pr-3">
           <Avatar className="h-7 w-7">
-            {avatarUrl ? (
-              <AvatarImage src={avatarUrl} alt={name} />
-            ) : null}
+            {avatarUrl ? <AvatarImage src={avatarUrl} alt={name} /> : null}
             <AvatarFallback>{initials(name)}</AvatarFallback>
           </Avatar>
-          <span className="hidden text-sm font-medium sm:inline">{name.split(" ")[0]}</span>
+          <span className="hidden text-sm font-medium sm:inline">
+            {name.split(" ")[0]}
+          </span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel className="flex flex-col gap-1">
           <span className="truncate">{name}</span>
-          <span className="truncate text-xs font-normal text-muted-foreground">{email}</span>
+          <span className="truncate text-xs font-normal text-muted-foreground">
+            {email}
+          </span>
         </DropdownMenuLabel>
         <div className="px-2 pb-1">
           <Badge variant="success" className="w-full justify-center">
@@ -84,7 +86,10 @@ export function NavbarUserMenu({
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={signOut} className="text-destructive focus:text-destructive">
+        <DropdownMenuItem
+          onClick={signOut}
+          className="text-destructive focus:text-destructive"
+        >
           <LogOut /> Sign out
         </DropdownMenuItem>
       </DropdownMenuContent>

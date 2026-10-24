@@ -8,7 +8,7 @@ const steps = [
     icon: QrCode,
     title: "Scan the Bin",
     description:
-      "Walk up to any EcoP smart bin on campus and scan its QR code with the app.",
+      "Walk up to any EcoP smart bin on campus and scan its QR code with your phone camera.",
     color: "from-emerald-500 to-green-400",
   },
   {
@@ -22,7 +22,7 @@ const steps = [
     icon: Award,
     title: "Earn Eco Points",
     description:
-      "Points are credited to your account instantly after AI verification. No manual review.",
+      "Points are credited after sufficient evidence or an authorized human review.",
     color: "from-green-500 to-emerald-400",
   },
   {
@@ -58,8 +58,8 @@ export function LandingHowItWorks() {
                 className={`flex flex-col items-center gap-8 lg:flex-row ${
                   i % 2 === 1 ? "lg:flex-row-reverse" : ""
                 }`}
-                initial={{ opacity: 0, x: i % 2 === 0 ? -30 : 30 }}
-                whileInView={{ opacity: 1, x: 0 }}
+                initial={false}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
                 transition={{
                   duration: 0.6,

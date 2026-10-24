@@ -1,4 +1,5 @@
 "use client";
+import { safeRedirect } from "@/lib/runtime";
 
 import * as React from "react";
 import Link from "next/link";
@@ -22,7 +23,7 @@ type LoginValues = z.infer<typeof loginSchema>;
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirect = searchParams.get("redirect") ?? ROUTES.DASHBOARD;
+  const redirect = safeRedirect(searchParams.get("redirect"));
 
   const {
     register,
@@ -84,7 +85,9 @@ export default function LoginPage() {
                 {...register("email")}
               />
               {errors.email && (
-                <p className="text-xs text-destructive">{errors.email.message}</p>
+                <p className="text-xs text-destructive">
+                  {errors.email.message}
+                </p>
               )}
             </div>
 
@@ -112,7 +115,11 @@ export default function LoginPage() {
               )}
             </div>
 
-            <Button type="submit" className="w-full gap-2" disabled={isSubmitting}>
+            <Button
+              type="submit"
+              className="w-full gap-2"
+              disabled={isSubmitting}
+            >
               {isSubmitting ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
@@ -125,7 +132,10 @@ export default function LoginPage() {
 
         <p className="mt-6 text-center text-sm text-muted-foreground">
           Don&apos;t have an account?{" "}
-          <Link href={ROUTES.REGISTER} className="font-medium text-primary hover:underline">
+          <Link
+            href={ROUTES.REGISTER}
+            className="font-medium text-primary hover:underline"
+          >
             Create one
           </Link>
         </p>

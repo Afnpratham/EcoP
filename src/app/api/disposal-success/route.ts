@@ -1,7 +1,12 @@
+import { checkOrigin, readJson, routeError } from "@/lib/http";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { awardDemoDisposal } from "@/lib/demo-store";
-import { apiError, zodErrorResponse, internalErrorResponse } from "@/lib/api-error";
+import {
+  apiError,
+  zodErrorResponse,
+  internalErrorResponse,
+} from "@/lib/api-error";
 
 const disposalSuccessSchema = z.object({
   binId: z.string().min(1).optional(),
@@ -15,10 +20,17 @@ const disposalSuccessSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
+  if (process.env.ECOP_DEMO_MODE !== "true") {
+    return apiError(
+      "FORBIDDEN",
+      "Simulation API is disabled outside explicit demo mode.",
+    );
+  }
   try {
+    checkOrigin(request);
     let body: unknown;
     try {
-      body = await request.json();
+      body = await readJson(request);
     } catch {
       return apiError("VALIDATION_ERROR", "Request body must be valid JSON.");
     }
@@ -30,6 +42,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
-    return internalErrorResponse(error);
+    return routeError(error);
   }
 }

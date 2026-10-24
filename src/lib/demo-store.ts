@@ -11,7 +11,10 @@ import type {
   TransactionRow,
 } from "@/types/database";
 
-const STORE_PATH = path.join(process.cwd(), "data", "demo-store.json");
+const STORE_PATH = path.join(
+  process.env.ECOP_DEMO_DATA_DIR || path.join(process.cwd(), "data"),
+  "demo-store.json",
+);
 const DEMO_USER_ID = "00000000-0000-4000-8000-000000000001";
 const COOLDOWN_MS = 4000;
 
@@ -36,6 +39,7 @@ export type DemoStoreData = {
     id: string;
     user_id: string;
     reward_id: string;
+    request_id?: string;
     points_spent: number;
     status: "pending";
     created_at: string;
@@ -180,7 +184,12 @@ async function readStoreUnlocked(): Promise<DemoStoreData> {
 
 async function writeStoreUnlocked(data: DemoStoreData) {
   await fs.mkdir(path.dirname(STORE_PATH), { recursive: true });
-  await fs.writeFile(STORE_PATH, JSON.stringify(data, null, 2), "utf8");
+  await fs.writeFile(
+    STORE_PATH + ".tmp",
+    JSON.stringify(data, null, 2),
+    "utf8",
+  );
+  await fs.rename(STORE_PATH + ".tmp", STORE_PATH);
 }
 
 export function getDemoStore() {
@@ -233,7 +242,8 @@ export function buildDemoDashboardPayload(store: DemoStoreData) {
       earned:
         achievement.condition_type === "disposals"
           ? totalBottles >= (achievement.threshold ?? Number.POSITIVE_INFINITY)
-          : store.user.eco_points >= (achievement.threshold ?? Number.POSITIVE_INFINITY),
+          : store.user.eco_points >=
+            (achievement.threshold ?? Number.POSITIVE_INFINITY),
       earnedAt: null,
     })),
     recentSessions: store.sessions.slice(0, 5).map((session) => ({
@@ -249,7 +259,9 @@ export function buildDemoDashboardPayload(store: DemoStoreData) {
     })),
     redemption: {
       availablePoints: store.user.eco_points,
-      sampleRewards: store.rewards.filter((reward) => reward.active).slice(0, 3),
+      sampleRewards: store.rewards
+        .filter((reward) => reward.active)
+        .slice(0, 3),
     },
   };
 }
@@ -283,9 +295,9 @@ export function awardDemoDisposal(input: DemoAwardInput) {
     const cycleId = input.cycleId ?? input.sessionId ?? null;
     const isSameCycle = Boolean(
       store.detectionLock.locked &&
-        (cycleId
-          ? store.detectionLock.cycleId === cycleId
-          : store.detectionLock.cycleId !== null),
+      (cycleId
+        ? store.detectionLock.cycleId === cycleId
+        : store.detectionLock.cycleId !== null),
     );
     const cooldownActive = Boolean(releaseAfter && now < releaseAfter);
 
@@ -306,7 +318,9 @@ export function awardDemoDisposal(input: DemoAwardInput) {
     const sessionId = input.sessionId ?? uuid();
     const binId = input.binId ?? input.dustbinId ?? "BIN-014";
     const disposalId = uuid();
-    const existingSession = store.sessions.find((session) => session.id === sessionId);
+    const existingSession = store.sessions.find(
+      (session) => session.id === sessionId,
+    );
 
     store.user.eco_points += ECO_POINTS_PER_DISPOSAL;
     if (existingSession) {
@@ -400,16 +414,45 @@ export function startDemoSession(binId: string) {
   });
 }
 
-export function redeemDemoReward(rewardId: string) {
+export function redeemDemoReward(rewardId: string, requestId?: string) {
   return enqueue(async () => {
     const store = await readStoreUnlocked();
-    const reward = store.rewards.find((item) => item.id === rewardId && item.active);
+    const existing = requestId
+      ? store.redemptions.find((r) => r.request_id === requestId)
+      : undefined;
+    if (existing) {
+      if (existing.reward_id !== rewardId)
+        return {
+          success: false,
+          status: "conflict",
+          message: "Request ID reused for a different reward.",
+        };
+      return {
+        success: true,
+        redemptionId: existing.id,
+        rewardId,
+        pointsSpent: existing.points_spent,
+        newTotal: store.user.eco_points,
+        duplicate: true,
+      };
+    }
+    const reward = store.rewards.find(
+      (item) => item.id === rewardId && item.active,
+    );
 
     if (!reward) {
-      return { success: false, status: "not_found", message: "Reward not found." };
+      return {
+        success: false,
+        status: "not_found",
+        message: "Reward not found.",
+      };
     }
     if (reward.stock <= 0) {
-      return { success: false, status: "out_of_stock", message: "Reward is out of stock." };
+      return {
+        success: false,
+        status: "out_of_stock",
+        message: "Reward is out of stock.",
+      };
     }
     if (store.user.eco_points < reward.cost_points) {
       return {
@@ -427,6 +470,7 @@ export function redeemDemoReward(rewardId: string) {
       id: redemptionId,
       user_id: store.user.id,
       reward_id: reward.id,
+      request_id: requestId,
       points_spent: reward.cost_points,
       status: "pending",
       created_at: timestamp,

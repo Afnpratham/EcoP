@@ -1,4 +1,5 @@
 "use client";
+import { ProfileSettings } from "@/components/shared/profile-settings";
 
 import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -25,7 +26,9 @@ import { toast } from "@/components/ui/toast-store";
 import type { TransactionRow, AchievementRow } from "@/types/database";
 
 interface DashboardData {
+  mode?: string;
   profile: {
+    leaderboard_opt_in?: boolean;
     id: string;
     full_name: string;
     email: string;
@@ -42,7 +45,10 @@ interface DashboardData {
     rank: number | null;
   };
   recentTransactions: TransactionRow[];
-  achievements: (AchievementRow & { earned: boolean; earnedAt: string | null })[];
+  achievements: (AchievementRow & {
+    earned: boolean;
+    earnedAt: string | null;
+  })[];
 }
 
 export default function ProfilePage() {
@@ -99,7 +105,9 @@ export default function ProfilePage() {
         </div>
 
         <div className="text-center sm:text-left">
-          <h1 className="font-display text-2xl font-bold">{profile.full_name}</h1>
+          <h1 className="font-display text-2xl font-bold">
+            {profile.full_name}
+          </h1>
           <div className="mt-1 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
             <Badge variant="default" className="capitalize">
               {profile.role}
@@ -202,6 +210,11 @@ export default function ProfilePage() {
         </CardContent>
       </Card>
 
+      <ProfileSettings
+        name={profile.full_name}
+        optIn={profile.leaderboard_opt_in ?? false}
+        demo={data.mode === "simulation"}
+      />
       {/* Achievements */}
       <Card>
         <CardHeader>
@@ -277,7 +290,9 @@ export default function ProfilePage() {
                       </p>
                     </div>
                   </div>
-                  <Badge variant={tx.type === "earn" ? "success" : "destructive"}>
+                  <Badge
+                    variant={tx.type === "earn" ? "success" : "destructive"}
+                  >
                     {tx.type === "earn" ? "+" : "−"}
                     {Math.abs(tx.amount)} pts
                   </Badge>

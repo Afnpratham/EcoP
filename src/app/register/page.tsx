@@ -61,6 +61,7 @@ export default function RegisterPage() {
         email: values.email,
         password: values.password,
         options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
           data: {
             full_name: values.fullName,
             role: values.role,
@@ -101,7 +102,9 @@ export default function RegisterPage() {
           <div className="mb-4 flex justify-center">
             <Logo size="lg" />
           </div>
-          <h1 className="font-display text-2xl font-bold">Create your account</h1>
+          <h1 className="font-display text-2xl font-bold">
+            Create your account
+          </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Start earning Eco Points in under a minute
           </p>
@@ -118,7 +121,9 @@ export default function RegisterPage() {
                 {...register("fullName")}
               />
               {errors.fullName && (
-                <p className="text-xs text-destructive">{errors.fullName.message}</p>
+                <p className="text-xs text-destructive">
+                  {errors.fullName.message}
+                </p>
               )}
             </div>
 
@@ -132,7 +137,9 @@ export default function RegisterPage() {
                 {...register("email")}
               />
               {errors.email && (
-                <p className="text-xs text-destructive">{errors.email.message}</p>
+                <p className="text-xs text-destructive">
+                  {errors.email.message}
+                </p>
               )}
             </div>
 
@@ -160,7 +167,9 @@ export default function RegisterPage() {
                 ))}
               </div>
               {errors.role && (
-                <p className="text-xs text-destructive">{errors.role.message}</p>
+                <p className="text-xs text-destructive">
+                  {errors.role.message}
+                </p>
               )}
             </div>
 
@@ -179,7 +188,9 @@ export default function RegisterPage() {
                   {...register("sapId")}
                 />
                 {errors.sapId && (
-                  <p className="text-xs text-destructive">{errors.sapId.message}</p>
+                  <p className="text-xs text-destructive">
+                    {errors.sapId.message}
+                  </p>
                 )}
               </motion.div>
             )}
@@ -220,7 +231,9 @@ export default function RegisterPage() {
                 </div>
               )}
               {errors.password && (
-                <p className="text-xs text-destructive">{errors.password.message}</p>
+                <p className="text-xs text-destructive">
+                  {errors.password.message}
+                </p>
               )}
             </div>
 
@@ -247,22 +260,31 @@ export default function RegisterPage() {
                 className="mt-1 h-4 w-4 rounded border-border accent-primary"
                 {...register("acceptTerms")}
               />
-              <Label htmlFor="acceptTerms" className="text-xs leading-normal text-muted-foreground">
+              <Label
+                htmlFor="acceptTerms"
+                className="text-xs leading-normal text-muted-foreground"
+              >
                 I agree to the{" "}
-                <a href="#" className="text-primary hover:underline">
+                <a href="/terms" className="text-primary hover:underline">
                   Terms of Service
                 </a>{" "}
                 and{" "}
-                <a href="#" className="text-primary hover:underline">
+                <a href="/terms" className="text-primary hover:underline">
                   Privacy Policy
                 </a>
               </Label>
             </div>
             {errors.acceptTerms && (
-              <p className="text-xs text-destructive">{errors.acceptTerms.message}</p>
+              <p className="text-xs text-destructive">
+                {errors.acceptTerms.message}
+              </p>
             )}
 
-            <Button type="submit" className="w-full gap-2" disabled={isSubmitting}>
+            <Button
+              type="submit"
+              className="w-full gap-2"
+              disabled={isSubmitting}
+            >
               {isSubmitting ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
@@ -275,7 +297,10 @@ export default function RegisterPage() {
 
         <p className="mt-6 text-center text-sm text-muted-foreground">
           Already have an account?{" "}
-          <Link href={ROUTES.LOGIN} className="font-medium text-primary hover:underline">
+          <Link
+            href={ROUTES.LOGIN}
+            className="font-medium text-primary hover:underline"
+          >
             Sign in
           </Link>
         </p>

@@ -1,10 +1,6 @@
 import { Navbar } from "@/components/shared/navbar";
 
-export default function BinLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function BinLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <Navbar />

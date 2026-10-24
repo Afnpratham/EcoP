@@ -1,21 +1,14 @@
 "use client";
 
 import { motion } from "framer-motion";
-import {
-  Camera,
-  Shield,
-  Zap,
-  Gift,
-  BarChart3,
-  Users,
-} from "lucide-react";
+import { Camera, Shield, Zap, Gift, BarChart3, Users } from "lucide-react";
 
 const features = [
   {
     icon: Camera,
     title: "AI Verification",
     description:
-      "Computer vision confirms every disposal in real-time. No manual review, no cheating.",
+      "Tracked evidence supports disposal decisions, with optional station sensors and human review when needed.",
   },
   {
     icon: Zap,
@@ -33,19 +26,19 @@ const features = [
     icon: Shield,
     title: "Privacy First",
     description:
-      "No face recognition. No stored imagery. Disposals are linked only through your voluntary QR session.",
+      "No face recognition. This app stores structured receipts. Disposals are linked only through your voluntary QR session.",
   },
   {
     icon: BarChart3,
     title: "Impact Dashboard",
     description:
-      "Track your environmental impact with beautiful charts showing bottles recycled and CO₂ saved.",
+      "Track verified disposals, points and refill activity. Follow material collection separately from disposal.",
   },
   {
     icon: Users,
     title: "Campus Leaderboard",
     description:
-      "Compete with peers, earn achievement badges, and climb the university leaderboard.",
+      "Opt into the community leaderboard, celebrate progress, and earn achievement badges.",
   },
 ];
 
@@ -84,7 +77,7 @@ export function LandingFeatures() {
         <motion.div
           className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
           variants={containerVariants}
-          initial="hidden"
+          initial={false}
           whileInView="visible"
           viewport={{ once: true, margin: "-60px" }}
         >

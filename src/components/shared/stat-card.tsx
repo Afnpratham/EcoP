@@ -64,7 +64,9 @@ export function StatCard({
       </div>
       <p className="mt-2 font-display text-2xl font-bold tabular-nums text-foreground sm:text-3xl">
         {text}
-        {suffix ? <span className="ml-1 text-base font-medium">{suffix}</span> : null}
+        {suffix ? (
+          <span className="ml-1 text-base font-medium">{suffix}</span>
+        ) : null}
       </p>
     </div>
   );

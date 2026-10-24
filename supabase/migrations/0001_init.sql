@@ -400,8 +400,11 @@ drop policy if exists "profiles_select_own" on public.profiles;
 create policy "profiles_select_own" on public.profiles
   for select using (auth.uid() = id);
 drop policy if exists "profiles_update_own" on public.profiles;
+-- Restrict client profile writes to safe columns using GRANT below.
 create policy "profiles_update_own" on public.profiles
-  for update using (auth.uid() = id);
+  for update using (auth.uid() = id) with check (auth.uid() = id);
+revoke update on public.profiles from authenticated;
+grant update (full_name, avatar_url) on public.profiles to authenticated;
 
 -- bins: anyone can read (public catalogue); writes are service-role only
 -- (no policy => service role bypasses RLS, clients cannot write).
@@ -414,6 +417,8 @@ drop policy if exists "sessions_select_own" on public.sessions;
 create policy "sessions_select_own" on public.sessions
   for select using (auth.uid() = user_id);
 drop policy if exists "sessions_insert_own" on public.sessions;
+-- Sessions must be started by the validated server route, not direct inserts.
+-- Remove user insert privileges in a production migration.
 create policy "sessions_insert_own" on public.sessions
   for insert with check (auth.uid() = user_id);
 
@@ -450,6 +455,5 @@ create policy "user_achievements_select_own" on public.user_achievements
   for select using (auth.uid() = user_id);
 
 -- The leaderboard view is public read.
-drop policy if exists "leaderboard_public_read" on public.leaderboard;
-create policy "leaderboard_public_read" on public.leaderboard
-  for select using (true);
+-- Views do not support RLS policies. Access controlled via underlying tables.
+-- Restrict access to the view separately as appropriate for deployment.

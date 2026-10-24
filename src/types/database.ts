@@ -21,9 +21,11 @@ export type ProfileRow = {
   sap_id: string | null;
   avatar_url: string | null;
   eco_points: number;
+  leaderboard_opt_in?: boolean;
   created_at: string;
 };
 export type ProfileInsert = {
+  leaderboard_opt_in?: boolean;
   id: string;
   full_name: string;
   email: string;
@@ -39,6 +41,8 @@ export type BinRow = {
   id: string;
   location: string;
   status: BinStatus;
+  kind: "disposal" | "refill";
+  proof_mode: "review" | "vision" | "fusion";
   created_at: string;
 };
 export type BinInsert = {
@@ -50,6 +54,7 @@ export type BinInsert = {
 export type BinUpdate = Partial<BinInsert>;
 
 export type SessionRow = {
+  kind?: "disposal" | "refill";
   id: string;
   user_id: string;
   bin_id: string;
@@ -185,50 +190,118 @@ export type LeaderboardRow = {
   rank: number;
 };
 
+export type EvidenceRow = {
+  id: string;
+  session_id: string;
+  user_id: string;
+  device_id: string;
+  boot_id: string;
+  track_id: string;
+  kind: "disposal" | "refill";
+  observed_at: string;
+  received_at: string;
+  outcome: "verified" | "inconclusive" | "rejected";
+  reason: string;
+  evidence: Record<string, unknown>;
+  request_hash: string;
+  points: number;
+};
+export type AppealRow = {
+  id: string;
+  event_id: string;
+  user_id: string;
+  reason: string;
+  created_at: string;
+};
+export type ReviewRow = {
+  id: string;
+  event_id: string;
+  reviewer_id: string;
+  approved: boolean;
+  reason: string;
+  created_at: string;
+};
+export type BatchRow = {
+  id: string;
+  bin_id: string;
+  collected_kg: number;
+  accepted_kg: number | null;
+  contamination: string;
+  collector_id: string;
+  receiver_id: string | null;
+  recycler: string | null;
+  receipt: string | null;
+  status: "collected" | "accepted";
+  created_at: string;
+  accepted_at: string | null;
+};
+type ReadTable<T> = { Row: T; Insert: never; Update: never; Relationships: [] };
+type JsonResult = Record<string, unknown>;
 export interface Database {
   public: {
     Tables: {
+      verification_events: ReadTable<EvidenceRow>;
+      appeals: ReadTable<AppealRow>;
+      reviews: ReadTable<ReviewRow>;
+      recycling_batches: ReadTable<BatchRow>;
+      batch_items: ReadTable<{ event_id: string; batch_id: string }>;
+      devices: ReadTable<{
+        id: string;
+        bin_id: string;
+        active: boolean;
+        beam_required: boolean;
+        load_required: boolean;
+      }>;
       profiles: {
+        Relationships: [];
         Row: ProfileRow;
         Insert: ProfileInsert;
         Update: ProfileUpdate;
       };
       bins: {
+        Relationships: [];
         Row: BinRow;
         Insert: BinInsert;
         Update: BinUpdate;
       };
       sessions: {
+        Relationships: [];
         Row: SessionRow;
         Insert: SessionInsert;
         Update: SessionUpdate;
       };
       disposals: {
+        Relationships: [];
         Row: DisposalRow;
         Insert: DisposalInsert;
         Update: Partial<DisposalInsert>;
       };
       transactions: {
+        Relationships: [];
         Row: TransactionRow;
         Insert: TransactionInsert;
         Update: Partial<TransactionInsert>;
       };
       rewards: {
+        Relationships: [];
         Row: RewardRow;
         Insert: RewardInsert;
         Update: RewardUpdate;
       };
       redemptions: {
+        Relationships: [];
         Row: RedemptionRow;
         Insert: RedemptionInsert;
         Update: Partial<RedemptionInsert>;
       };
       achievements: {
+        Relationships: [];
         Row: AchievementRow;
         Insert: AchievementInsert;
         Update: Partial<AchievementInsert>;
       };
       user_achievements: {
+        Relationships: [];
         Row: UserAchievementRow;
         Insert: UserAchievementInsert;
         Update: Partial<UserAchievementInsert>;
@@ -236,10 +309,50 @@ export interface Database {
     };
     Views: {
       leaderboard: {
+        Relationships: [];
         Row: LeaderboardRow;
       };
     };
     Functions: {
+      resolve_ecop_redemption: {
+        Args: { p_redemption_id: string; p_action: string; p_note: string };
+        Returns: JsonResult;
+      };
+      start_ecop_session: { Args: { p_bin_id: string }; Returns: JsonResult };
+      record_ecop_event: {
+        Args: { p_event: Record<string, unknown> };
+        Returns: JsonResult;
+      };
+      appeal_ecop_event: {
+        Args: { p_event_id: string; p_reason: string };
+        Returns: JsonResult;
+      };
+      review_ecop_event: {
+        Args: { p_event_id: string; p_approve: boolean; p_reason: string };
+        Returns: JsonResult;
+      };
+      redeem_ecop_reward: {
+        Args: { p_reward_id: string; p_request_id: string };
+        Returns: JsonResult;
+      };
+      collect_ecop_batch: {
+        Args: {
+          p_bin_id: string;
+          p_mass: number;
+          p_contamination: string;
+          p_event_ids: string[];
+        };
+        Returns: JsonResult;
+      };
+      accept_ecop_batch: {
+        Args: {
+          p_batch_id: string;
+          p_mass: number;
+          p_recycler: string;
+          p_receipt: string;
+        };
+        Returns: JsonResult;
+      };
       award_points_for_session: {
         Args: { p_session_id: string };
         Returns: {

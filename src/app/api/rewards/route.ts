@@ -1,46 +1,39 @@
 import { NextResponse } from "next/server";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { authenticated, routeError } from "@/lib/http";
 import { getDemoStore } from "@/lib/demo-store";
-import { internalErrorResponse } from "@/lib/api-error";
-import type { RewardRow } from "@/types/database";
-
-/**
- * GET /api/rewards
- * Returns all active rewards. Auth optional.
- */
+import { isDemoMode } from "@/lib/runtime";
 export async function GET() {
   try {
-    let supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>;
-    try {
-      supabase = await createSupabaseServerClient();
-    } catch {
-      const store = await getDemoStore();
+    if (isDemoMode()) {
+      const s = await getDemoStore();
       return NextResponse.json({
-        rewards: store.rewards.filter((reward) => reward.active),
-        availablePoints: store.user.eco_points,
+        rewards: s.rewards.filter((r) => r.active),
+        availablePoints: s.user.eco_points,
+        redemptions: s.redemptions,
+        mode: "simulation",
+        isAdmin: false,
       });
     }
-
-    const result = await supabase
-      .from("rewards")
-      .select("*")
-      .eq("active", true)
-      .order("cost_points", { ascending: true });
-
-    if (result.error) throw result.error;
-
-    const rewards = (result.data ?? []) as RewardRow[];
-
-    return NextResponse.json({ rewards });
+    const { db, user } = await authenticated();
+    const [rewards, profile, redemptions] = await Promise.all([
+      db.from("rewards").select("*").eq("active", true).order("cost_points"),
+      db.from("profiles").select("eco_points,role").eq("id", user.id).single(),
+      db
+        .from("redemptions")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(100),
+    ]);
+    for (const r of [rewards, profile, redemptions]) if (r.error) throw r.error;
+    return NextResponse.json({
+      rewards: rewards.data,
+      availablePoints: profile.data?.eco_points,
+      redemptions: redemptions.data,
+      isAdmin: profile.data?.role === "admin",
+      userId: user.id,
+      mode: "live",
+    });
   } catch (error) {
-    try {
-      const store = await getDemoStore();
-      return NextResponse.json({
-        rewards: store.rewards.filter((reward) => reward.active),
-        availablePoints: store.user.eco_points,
-      });
-    } catch {
-      return internalErrorResponse(error);
-    }
+    return routeError(error);
   }
 }

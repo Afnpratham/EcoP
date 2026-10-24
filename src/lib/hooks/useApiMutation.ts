@@ -23,9 +23,7 @@ export async function apiFetch<T>(
   }).finally(() => window.clearTimeout(timeout));
 
   const data = (await res.json().catch(() => null)) as
-    | T
-    | { error: { code: string; message: string } }
-    | null;
+    T | { error: { code: string; message: string } } | null;
 
   if (!res.ok) {
     const message =

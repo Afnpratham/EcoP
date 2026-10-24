@@ -22,7 +22,11 @@ export const passwordSchema = z
   );
 
 export const loginSchema = z.object({
-  email: z.string().trim().min(1, "Email is required").email("Enter a valid email"),
+  email: z
+    .string()
+    .trim()
+    .min(1, "Email is required")
+    .email("Enter a valid email"),
   password: z.string().min(1, "Password is required"),
 });
 
@@ -33,13 +37,17 @@ export const registerSchema = z
       .trim()
       .min(2, "Name must be at least 2 characters")
       .max(100, "Name is too long"),
-    email: z.string().trim().min(1, "Email is required").email("Enter a valid email"),
+    email: z
+      .string()
+      .trim()
+      .min(1, "Email is required")
+      .email("Enter a valid email"),
     password: passwordSchema,
     confirmPassword: z.string().min(1, "Please confirm your password"),
     role: z.enum(["student", "faculty", "visitor"]),
     sapId: z.string().trim().optional(),
     acceptTerms: z.literal(true, {
-      errorMap: () => ({ message: "You must accept the Terms to continue" }),
+      error: "You must accept the Terms to continue",
     }),
   })
   .superRefine((data, ctx) => {
@@ -69,7 +77,11 @@ export const registerSchema = z
   });
 
 export const forgotPasswordSchema = z.object({
-  email: z.string().trim().min(1, "Email is required").email("Enter a valid email"),
+  email: z
+    .string()
+    .trim()
+    .min(1, "Email is required")
+    .email("Enter a valid email"),
 });
 
 export const resetPasswordSchema = z
@@ -93,29 +105,6 @@ export const startSessionSchema = z.object({
     // Allow any printable, non-whitespace token. The DB is authoritative.
     .regex(/^[A-Za-z0-9_-]+$/, "Bin ID has an invalid format"),
 });
-
-// ── Disposal verify (webhook from Awareness Engine) ───────────────────────
-
-export const disposalVerifySchema = z
-  .object({
-    sessionId: z.string().uuid("sessionId must be a valid UUID").optional(),
-    binId: z
-      .string()
-      .trim()
-      .min(1, "binId is required when sessionId is not provided")
-      .max(50, "binId is too long")
-      .regex(/^[A-Za-z0-9_-]+$/, "binId has an invalid format")
-      .optional(),
-    result: z.enum(["success", "failure"]),
-    confidence: z.number().min(0).max(1),
-    timestamp: z
-      .union([z.string(), z.number()])
-      .transform((v) => (typeof v === "number" ? new Date(v) : new Date(v))),
-  })
-  .refine((data) => Boolean(data.sessionId || data.binId), {
-    message: "Either sessionId or binId is required",
-    path: ["sessionId"],
-  });
 
 // ── Rewards ───────────────────────────────────────────────────────────────
 

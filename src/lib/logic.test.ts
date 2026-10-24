@@ -113,7 +113,9 @@ describe("session creation logic", () => {
   it("session has correct pending status", () => {
     const session = {
       status: "pending" as const,
-      expires_at: new Date(Date.now() + SESSION_TTL_SECONDS * 1000).toISOString(),
+      expires_at: new Date(
+        Date.now() + SESSION_TTL_SECONDS * 1000,
+      ).toISOString(),
     };
     expect(session.status).toBe("pending");
   });

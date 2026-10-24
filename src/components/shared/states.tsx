@@ -29,7 +29,9 @@ export function EmptyState({
       </div>
       <p className="font-medium text-foreground">{title}</p>
       {description ? (
-        <p className="mt-1 max-w-sm text-sm text-muted-foreground">{description}</p>
+        <p className="mt-1 max-w-sm text-sm text-muted-foreground">
+          {description}
+        </p>
       ) : null}
       {action ? (
         <Button onClick={action.onClick} size="sm" className="mt-4">
@@ -63,7 +65,9 @@ export function ErrorState({
         <AlertTriangle className="h-6 w-6" />
       </div>
       <p className="font-medium text-foreground">{title}</p>
-      <p className="mt-1 max-w-sm text-sm text-muted-foreground">{description}</p>
+      <p className="mt-1 max-w-sm text-sm text-muted-foreground">
+        {description}
+      </p>
       {onRetry ? (
         <Button onClick={onRetry} size="sm" variant="outline" className="mt-4">
           <RefreshCw className="mr-2 h-4 w-4" /> Try again

@@ -1,51 +1,44 @@
-"use client";
-
-import { motion } from "framer-motion";
-import { StatCard } from "@/components/shared/stat-card";
-import { Recycle, Droplets, TreePine, Flame } from "lucide-react";
-
+import { Fingerprint, Scale, Route, Droplets } from "lucide-react";
 export function LandingStats() {
   return (
-    <section id="impact" className="border-t border-border bg-secondary/30 py-24">
-      <div className="container">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
-            Live Impact Statistics
-          </h2>
-          <p className="mt-4 text-muted-foreground">
-            Real numbers from the EcoP community. Every bottle counts.
-          </p>
-        </div>
-
-        <motion.div
-          className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-60px" }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <StatCard
-            label="Bottles Recycled"
-            value={12847}
-            icon={<Recycle />}
-          />
-          <StatCard
-            label="CO₂ Saved"
-            value={694}
-            suffix="kg"
-            icon={<Droplets />}
-          />
-          <StatCard
-            label="Trees Planted"
-            value={47}
-            icon={<TreePine />}
-          />
-          <StatCard
-            label="Active Streaks"
-            value={328}
-            icon={<Flame />}
-          />
-        </motion.div>
+    <section id="impact" className="container py-16">
+      <div className="mb-9 max-w-2xl">
+        <p className="eyebrow">Clarity at every step</p>
+        <h2 className="mt-3 font-display text-4xl font-semibold tracking-tight">
+          Good intentions deserve good evidence.
+        </h2>
+      </div>
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {[
+          {
+            icon: Fingerprint,
+            title: "A receipt, every time",
+            body: "Trace each verified action to its session and evidence.",
+          },
+          {
+            icon: Scale,
+            title: "Room for a second look",
+            body: "Uncertain decisions can be appealed. No automatic point penalties.",
+          },
+          {
+            icon: Route,
+            title: "Beyond the bin",
+            body: "Follow collection and recycler acceptance as separate milestones.",
+          },
+          {
+            icon: Droplets,
+            title: "Prevention counts",
+            body: "Validated refills earn their own rewards without inflating recycling totals.",
+          },
+        ].map(({ icon: Icon, title, body }) => (
+          <div key={title} className="surface p-6">
+            <Icon className="text-primary" />
+            <h3 className="mb-2 mt-7 text-lg font-semibold">{title}</h3>
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              {body}
+            </p>
+          </div>
+        ))}
       </div>
     </section>
   );

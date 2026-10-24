@@ -17,7 +17,13 @@ export function Logo({
     size === "lg" ? "text-2xl" : size === "sm" ? "text-base" : "text-xl";
 
   const content = (
-    <span className={cn("inline-flex items-center gap-2 font-display", text, className)}>
+    <span
+      className={cn(
+        "inline-flex items-center gap-2 font-display",
+        text,
+        className,
+      )}
+    >
       <span className="grid h-7 w-7 place-items-center rounded-lg bg-primary text-primary-foreground">
         <Leaf className="h-4 w-4" />
       </span>

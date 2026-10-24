@@ -17,7 +17,13 @@ export function useRealtimePoints(userId: string | undefined | null) {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    if (!userId) return;
+    if (
+      !userId ||
+      userId.startsWith("demo") ||
+      !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+      !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    )
+      return;
     const supabase = createSupabaseBrowserClient();
 
     const channel = supabase

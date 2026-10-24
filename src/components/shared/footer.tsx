@@ -15,22 +15,37 @@ export function Footer() {
             <span className="font-display font-bold">
               Eco<span className="text-primary">P</span>
             </span>
-            <span className="text-muted-foreground">· {new Date().getFullYear()}</span>
+            <span className="text-muted-foreground">
+              · {new Date().getFullYear()}
+            </span>
           </div>
 
           <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
-            <Link href={ROUTES.HOME} className="hover:text-foreground">Home</Link>
-            <Link href="/#how-it-works" className="hover:text-foreground">How it works</Link>
-            <Link href="/login" className="hover:text-foreground">Log in</Link>
-            <Link href="/register" className="hover:text-foreground">Sign up</Link>
-            <a href="#" className="hover:text-foreground">Privacy</a>
-            <a href="#" className="hover:text-foreground">Terms</a>
+            <Link href={ROUTES.HOME} className="hover:text-foreground">
+              Home
+            </Link>
+            <Link href="/#how-it-works" className="hover:text-foreground">
+              How it works
+            </Link>
+            <Link href="/login" className="hover:text-foreground">
+              Log in
+            </Link>
+            <Link href="/register" className="hover:text-foreground">
+              Sign up
+            </Link>
+            <Link href="/privacy" className="hover:text-foreground">
+              Privacy
+            </Link>
+            <Link href="/terms" className="hover:text-foreground">
+              Terms
+            </Link>
           </nav>
         </div>
         <p className="mt-8 text-center text-xs text-muted-foreground">
-          EcoP — Rewarding Sustainable Behaviour Through AI. The Awareness Engine never performs face
-          recognition, never stores imagery, and links disposal events to users only through the QR
-          session you voluntarily create.
+          EcoP — Rewarding Sustainable Behaviour Through AI. The Awareness
+          Engine never performs face recognition. This application stores event
+          receipts, not camera images, and links disposal events to users only
+          through the QR session you voluntarily create.
         </p>
       </div>
     </footer>

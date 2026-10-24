@@ -1,3 +1,6 @@
+import { isDemoMode } from "@/lib/runtime";
+import { getDemoStore } from "@/lib/demo-store";
+import { authenticated } from "@/lib/http";
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { leaderboardQuerySchema } from "@/lib/validations";
@@ -19,16 +22,27 @@ export async function GET(request: NextRequest) {
     if (!parsed.success) return zodErrorResponse(parsed.error);
 
     const { page, pageSize, scope } = parsed.data;
-    const supabase = await createSupabaseServerClient();
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    if (isDemoMode()) {
+      const store = await getDemoStore();
+      const users =
+        scope === "all" || scope === "students"
+          ? [{ ...store.user, rank: 1 }]
+          : [];
+      return NextResponse.json({
+        users: page === 1 ? users : [],
+        total: users.length,
+        page,
+        pageSize,
+        currentUserId: store.user.id,
+        mode: "simulation",
+      });
+    }
+    const { db: supabase, user } = await authenticated();
 
     let query = supabase.from("leaderboard").select("*", { count: "exact" });
 
     if (scope !== "all") {
-      const roleMap: Record<string, string> = {
+      const roleMap: Record<string, "student" | "faculty" | "visitor"> = {
         students: "student",
         faculty: "faculty",
         visitors: "visitor",

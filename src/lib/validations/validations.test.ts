@@ -4,7 +4,6 @@ import {
   registerSchema,
   forgotPasswordSchema,
   startSessionSchema,
-  disposalVerifySchema,
   redeemRewardSchema,
   leaderboardQuerySchema,
   passwordStrength,
@@ -147,77 +146,6 @@ describe("startSessionSchema", () => {
 
   it("accepts alphanumeric with dashes", () => {
     const result = startSessionSchema.safeParse({ binId: "BIN-014_A" });
-    expect(result.success).toBe(true);
-  });
-});
-
-describe("disposalVerifySchema", () => {
-  it("accepts valid payload", () => {
-    const result = disposalVerifySchema.safeParse({
-      sessionId: "550e8400-e29b-41d4-a716-446655440000",
-      result: "success",
-      confidence: 0.95,
-      timestamp: new Date().toISOString(),
-    });
-    expect(result.success).toBe(true);
-  });
-
-  it("accepts binId instead of sessionId", () => {
-    const result = disposalVerifySchema.safeParse({
-      binId: "BIN-014",
-      result: "success",
-      confidence: 0.95,
-      timestamp: new Date().toISOString(),
-    });
-    expect(result.success).toBe(true);
-  });
-
-  it("rejects payload without sessionId or binId", () => {
-    const result = disposalVerifySchema.safeParse({
-      result: "success",
-      confidence: 0.95,
-      timestamp: new Date().toISOString(),
-    });
-    expect(result.success).toBe(false);
-  });
-
-  it("rejects invalid sessionId", () => {
-    const result = disposalVerifySchema.safeParse({
-      sessionId: "not-a-uuid",
-      result: "success",
-      confidence: 0.95,
-      timestamp: Date.now(),
-    });
-    expect(result.success).toBe(false);
-  });
-
-  it("rejects invalid result", () => {
-    const result = disposalVerifySchema.safeParse({
-      sessionId: "550e8400-e29b-41d4-a716-446655440000",
-      result: "maybe",
-      confidence: 0.5,
-      timestamp: Date.now(),
-    });
-    expect(result.success).toBe(false);
-  });
-
-  it("rejects confidence out of range", () => {
-    const result = disposalVerifySchema.safeParse({
-      sessionId: "550e8400-e29b-41d4-a716-446655440000",
-      result: "success",
-      confidence: 1.5,
-      timestamp: Date.now(),
-    });
-    expect(result.success).toBe(false);
-  });
-
-  it("accepts numeric timestamp", () => {
-    const result = disposalVerifySchema.safeParse({
-      sessionId: "550e8400-e29b-41d4-a716-446655440000",
-      result: "failure",
-      confidence: 0.1,
-      timestamp: Date.now(),
-    });
     expect(result.success).toBe(true);
   });
 });

@@ -68,9 +68,9 @@ export function apiSuccess<T>(data: T, init?: ResponseInit): NextResponse {
 export function zodErrorResponse(error: ZodError): NextResponse {
   return apiError(
     "VALIDATION_ERROR",
-    error.errors[0]?.message ?? "Invalid request body",
+    error.issues[0]?.message ?? "Invalid request body",
     {
-      issues: error.errors.map((e) => ({ path: e.path, message: e.message })),
+      issues: error.issues.map((e) => ({ path: e.path, message: e.message })),
     },
   );
 }
@@ -78,6 +78,9 @@ export function zodErrorResponse(error: ZodError): NextResponse {
 /** Safely log + return a 500 for unexpected errors (no internals in body). */
 export function internalErrorResponse(error: unknown): NextResponse {
   // eslint-disable-next-line no-console
-  console.error("[api] internal error", error);
+  console.error(
+    "[api] internal error",
+    error instanceof Error ? error.name : "DatabaseError",
+  );
   return apiError("INTERNAL_ERROR", "Something went wrong. Please try again.");
 }

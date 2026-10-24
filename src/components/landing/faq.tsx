@@ -8,11 +8,11 @@ import { cn } from "@/lib/utils";
 const faqs = [
   {
     q: "How does EcoP verify disposals?",
-    a: "EcoP uses a computer-vision service called the Awareness Engine. When you start a disposal session by scanning a bin's QR code, the camera near the bin detects and verifies the type of item disposed. Points are only awarded after AI confirmation.",
+    a: "EcoP uses a computer-vision service called the Awareness Engine. When you start a disposal session by scanning a bin's QR code, the camera near the bin detects and verifies the type of item disposed. Rewards follow the configured evidence policy or an authorized human review.",
   },
   {
     q: "Is my privacy protected?",
-    a: "Absolutely. The Awareness Engine never performs face recognition and never stores imagery. Disposal events are linked to your account only through the voluntary QR session you create — no biometric data is collected.",
+    a: "EcoP does not perform face recognition. This app stores structured evidence receipts; ask your operator about local camera and log retention. Disposal events are linked to your account only through the voluntary QR session you create — no biometric data is collected.",
   },
   {
     q: "What can I redeem Eco Points for?",
@@ -24,11 +24,11 @@ const faqs = [
   },
   {
     q: "What happens if the AI makes a mistake?",
-    a: "The system uses a confidence threshold. If the confidence is too low, the disposal is not verified and you can try again. We continuously train and improve the model to ensure high accuracy.",
+    a: "Uncertain evidence is saved for review without an automatic penalty. Open your receipt in Impact to submit an appeal. An authorized reviewer records the decision and explanation.",
   },
   {
     q: "Can I cheat the system?",
-    a: "The Awareness Engine detects non-recyclable items and empty disposals. Sessions expire after 5 minutes and there are cooldowns per bin. The system is designed to be tamper-resistant.",
+    a: "Device signatures, session binding, duplicate checks and rate limits reduce abuse. Computer vision has limits, particularly under occlusion or ambiguous attribution; uncertain evidence is reviewed.",
   },
 ];
 
@@ -38,6 +38,7 @@ function FAQItem({ q, a }: { q: string; a: string }) {
   return (
     <div className="border-b border-border last:border-0">
       <button
+        aria-expanded={open}
         onClick={() => setOpen(!open)}
         className="flex w-full items-center justify-between py-5 text-left text-sm font-medium transition-colors hover:text-primary"
       >

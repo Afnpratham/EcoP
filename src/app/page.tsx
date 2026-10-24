@@ -18,8 +18,6 @@ export default function HomePage() {
         <LandingFeatures />
         <LandingHowItWorks />
         <LandingStats />
-        <LandingLeaderboard />
-        <LandingTestimonials />
         <LandingFAQ />
         <LandingCTA />
       </main>

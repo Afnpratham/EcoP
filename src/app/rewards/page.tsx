@@ -12,10 +12,14 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState, ErrorState } from "@/components/shared/states";
-import type { RewardRow } from "@/types/database";
+import type { RewardRow, RedemptionRow } from "@/types/database";
 
 interface RewardsResponse {
   rewards: RewardRow[];
+  mode?: string;
+  isAdmin?: boolean;
+  userId?: string;
+  redemptions: RedemptionRow[];
   availablePoints?: number;
 }
 
@@ -31,24 +35,37 @@ export default function RewardsPage() {
   const { data, isLoading, error, refetch } = useQuery<RewardsResponse>({
     queryKey: ["rewards"],
     queryFn: () => apiFetch<RewardsResponse>("/api/rewards"),
-    refetchInterval: 2000,
+    refetchInterval: 15000,
   });
 
   // Get user's current points from dashboard data
-  const dashboardData = queryClient.getQueryData<{ stats: { ecoPoints: number } }>(["dashboard"]);
-  const userPoints = data?.availablePoints ?? dashboardData?.stats?.ecoPoints ?? 0;
+  const dashboardData = queryClient.getQueryData<{
+    stats: { ecoPoints: number };
+  }>(["dashboard"]);
+  const userPoints =
+    data?.availablePoints ?? dashboardData?.stats?.ecoPoints ?? 0;
 
-  const redeemMutation = useApiMutation<{ rewardId: string }, RedeemResponse>(
-    "/api/reward/redeem",
-  );
+  const redeemMutation = useApiMutation<
+    { rewardId: string; requestId: string },
+    RedeemResponse
+  >("/api/reward/redeem");
 
   const [redeemingId, setRedeemingId] = React.useState<string | null>(null);
 
+  const [notes, setNotes] = React.useState<Record<string, string>>({});
+  const resolve = useApiMutation<
+    { redemptionId: string; action: string; note: string },
+    unknown
+  >("/api/reward/resolve");
+  const requestIds = React.useRef<Record<string, string>>({});
   async function handleRedeem(rewardId: string) {
     setRedeemingId(rewardId);
     try {
-      await redeemMutation.mutateAsync({ rewardId });
-      toast.success("Reward redeemed successfully!");
+      const requestId = (requestIds.current[rewardId] ??= crypto.randomUUID());
+      const receipt = await redeemMutation.mutateAsync({ rewardId, requestId });
+      delete requestIds.current[rewardId];
+      toast.success(`Redemption receipt: ${receipt.redemptionId}`);
+
       queryClient.invalidateQueries({ queryKey: ["dashboard"] });
       queryClient.invalidateQueries({ queryKey: ["rewards"] });
       queryClient.invalidateQueries({ queryKey: ["profile"] });
@@ -124,9 +141,7 @@ export default function RewardsPage() {
                     variant={reward.stock > 0 ? "success" : "destructive"}
                     className="shadow-sm"
                   >
-                    {reward.stock > 0
-                      ? `${reward.stock} left`
-                      : "Out of stock"}
+                    {reward.stock > 0 ? `${reward.stock} left` : "Out of stock"}
                   </Badge>
                 </div>
               </div>
@@ -171,6 +186,90 @@ export default function RewardsPage() {
             </motion.div>
           ))}
         </div>
+      )}
+      {data && data.redemptions?.length > 0 && (
+        <section className="surface space-y-4 p-6">
+          <h2 className="text-xl font-semibold">Redemption receipts</h2>
+          <p className="text-sm text-muted-foreground">
+            Show your receipt to the operator. Pending rewards can be cancelled
+            for a full points refund. Showing the latest 100.
+          </p>
+          {data.redemptions.map((r) => (
+            <article className="rounded-xl border p-4" key={r.id}>
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="font-medium">
+                    {data.rewards.find((w) => w.id === r.reward_id)?.name ??
+                      "Reward"}
+                  </p>
+                  <p className="mt-1 break-all font-mono text-xs text-muted-foreground">
+                    {r.id}
+                  </p>
+                </div>
+                <Badge>
+                  {r.status} · {r.points_spent} points
+                </Badge>
+              </div>
+              {r.status === "pending" && data.mode !== "simulation" && (
+                <div className="mt-4 space-y-2">
+                  <label className="block text-sm">
+                    Fulfillment or cancellation note
+                    <input
+                      className="mt-1 w-full rounded-lg border bg-background p-2"
+                      minLength={5}
+                      maxLength={500}
+                      value={notes[r.id] ?? ""}
+                      onChange={(e) =>
+                        setNotes({ ...notes, [r.id]: e.target.value })
+                      }
+                    />
+                  </label>
+                  <div className="flex gap-2">
+                    {[
+                      "cancelled",
+                      ...(data.isAdmin && r.user_id !== data.userId
+                        ? ["fulfilled"]
+                        : []),
+                    ].map((action) => (
+                      <Button
+                        key={action}
+                        variant="outline"
+                        disabled={
+                          resolve.isPending ||
+                          (notes[r.id]?.trim().length ?? 0) < 5
+                        }
+                        onClick={async () => {
+                          try {
+                            await resolve.mutateAsync({
+                              redemptionId: r.id,
+                              action,
+                              note: notes[r.id]!,
+                            });
+                            await queryClient.invalidateQueries({
+                              queryKey: ["rewards"],
+                            });
+                            await queryClient.invalidateQueries({
+                              queryKey: ["dashboard"],
+                            });
+                            toast.success("Receipt updated.");
+                          } catch (e) {
+                            toast.error(
+                              e instanceof Error ? e.message : "Update failed",
+                            );
+                          }
+                        }}
+                      >
+                        {action === "cancelled"
+                          ? "Cancel & refund"
+                          : "Mark fulfilled"}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </article>
+          ))}
+        </section>
       )}
     </div>
   );

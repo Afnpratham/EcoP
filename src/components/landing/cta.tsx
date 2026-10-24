@@ -12,7 +12,7 @@ export function LandingCTA() {
       <div className="container">
         <motion.div
           className="relative mx-auto max-w-3xl overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent p-12 text-center"
-          initial={{ opacity: 0, scale: 0.96 }}
+          initial={false}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true, margin: "-40px" }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}

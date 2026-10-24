@@ -24,7 +24,13 @@ export async function createSupabaseServerClient() {
       getAll() {
         return cookieStore.getAll();
       },
-      setAll(cookiesToSet: Array<{ name: string; value: string; options?: Record<string, unknown> }>) {
+      setAll(
+        cookiesToSet: Array<{
+          name: string;
+          value: string;
+          options?: Record<string, unknown>;
+        }>,
+      ) {
         try {
           cookiesToSet.forEach(({ name, value, options }) =>
             cookieStore.set(name, value, options as any),
@@ -49,6 +55,7 @@ export async function getServerUser() {
 
 /** Convenience: returns the current user's profile row, or null. */
 export async function getServerProfile() {
+  if (process.env.ECOP_DEMO_MODE === "true") return null;
   const user = await getServerUser();
   if (!user) return null;
   const supabase = await createSupabaseServerClient();

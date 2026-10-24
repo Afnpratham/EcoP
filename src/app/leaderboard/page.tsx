@@ -75,9 +75,7 @@ export default function LeaderboardPage() {
   const filtered = React.useMemo(() => {
     if (!data?.users || !search) return data?.users ?? [];
     const q = search.toLowerCase();
-    return data.users.filter((u) =>
-      u.full_name.toLowerCase().includes(q),
-    );
+    return data.users.filter((u) => u.full_name.toLowerCase().includes(q));
   }, [data?.users, search]);
 
   return (
@@ -165,7 +163,8 @@ export default function LeaderboardPage() {
                   key={user.id}
                   className={cn(
                     "grid grid-cols-12 items-center px-6 py-4 transition-colors hover:bg-muted/30",
-                    isCurrentUser && "bg-primary/5 ring-1 ring-inset ring-primary/20",
+                    isCurrentUser &&
+                      "bg-primary/5 ring-1 ring-inset ring-primary/20",
                   )}
                   initial={{ opacity: 0, x: -8 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -175,7 +174,10 @@ export default function LeaderboardPage() {
                   <div className="col-span-7 flex items-center gap-3">
                     <Avatar className="h-9 w-9">
                       {user.avatar_url && (
-                        <AvatarImage src={user.avatar_url} alt={user.full_name} />
+                        <AvatarImage
+                          src={user.avatar_url}
+                          alt={user.full_name}
+                        />
                       )}
                       <AvatarFallback className="text-xs">
                         {initials(user.full_name)}
@@ -185,7 +187,9 @@ export default function LeaderboardPage() {
                       <p className="text-sm font-medium">
                         {user.full_name}
                         {isCurrentUser && (
-                          <span className="ml-2 text-xs text-primary">(You)</span>
+                          <span className="ml-2 text-xs text-primary">
+                            (You)
+                          </span>
                         )}
                       </p>
                     </div>

@@ -1,144 +1,71 @@
-# EcoP
+# EcoP 2.0
 
-EcoP is a responsive sustainability rewards platform for plastic-bottle disposal. Users scan a bin QR code, start a disposal session, let the Awareness Engine verify the bottle disposal, and receive Eco Points that can be tracked on a dashboard, compared on leaderboards, and redeemed for rewards.
+EcoP turns verified bottle disposal and refill actions into a transparent rewards workflow. It pairs a Next.js application with Supabase and a pinned companion Awareness Engine. The release focuses on safe attribution, evidence receipts, human review, reward integrity and a material chain of custody.
 
-The app is built with Next.js, React, TypeScript, Tailwind CSS, Supabase, and Vitest.
+## What is included
 
-## Functionality
+- Proof of disposal: QR-bound sessions, signed device events, temporal tracking evidence, optional beam/load sensor fusion, replay prevention and device/boot/track deduplication.
+- Fair rewards: an append-only points ledger, atomic reward redemption, cancellation refund, operator fulfillment, appeal requests and conflict-of-interest checks for reviewers.
+- Recycling traceability: a verified receipt can be assigned once to a collection batch; collection and recycler acceptance require separate operator actions.
+- Personal guidance: receipt-based guidance that never treats an uncertain result as a penalty.
+- Refill/reuse: separate refill sessions and rewards with daily and rolling limits. Refill activity is never counted as recovered recycling material.
+- A responsive user experience: station discovery, action sessions, receipts, appeal/review workspace, reward receipts, privacy settings and an explicit simulation lab.
 
-- QR/bin disposal sessions with session expiry, cooldowns, and rate limits.
-- HMAC-protected Awareness Engine webhook for service-to-service disposal verification.
-- Automatic point awards through a Supabase `SECURITY DEFINER` function.
-- Append-only transaction ledger for Eco Points.
-- Dashboard with points, disposal totals, impact stats, recent activity, and achievements.
-- Reward catalogue and redemption flow.
-- Leaderboard views for ranking users by Eco Points.
-- Authentication-ready registration, login, forgot-password, and profile screens.
-- Demo mode backed by `data/demo-store.json` when Supabase is unavailable or no user is signed in.
-- Full V1 product, architecture, database, API, security, and deployment specification under `docs/spec`.
+## Truthful operating modes
 
-## Core Flow
+`ECOP_DEMO_MODE=true` is an isolated local simulation workspace using sample data. It does not use live Supabase records, device ingestion, cameras or physical sensors. It is visibly labelled and must not be used for real rewards.
 
-1. A user opens `/ecop/bin/[binId]` after scanning a bin QR code.
-2. EcoP creates a pending session through `POST /api/session/start`.
-3. The Awareness Engine watches the bin, detects a plastic bottle, and decides whether disposal was correct.
-4. The engine calls `POST /api/disposal/verify` with an HMAC signature.
-5. EcoP verifies the signature, resolves the pending session, awards points once, and updates the user's dashboard.
+When demo mode is disabled, EcoP never converts missing auth, a database failure or unavailable hardware into a successful demo action. A live device event requires a per-device HMAC secret and a matching session, device, bin, time window and track identity.
 
-## Tech Stack
-
-- Next.js App Router
-- React 19
-- TypeScript
-- Tailwind CSS
-- Supabase Auth and Postgres
-- Radix UI primitives
-- React Query
-- Zod validation
-- Vitest
-
-## Getting Started
-
-Install dependencies:
+## Local setup
 
 ```bash
 npm install
-```
-
-Create local environment variables:
-
-```bash
 cp .env.example .env.local
-```
-
-Fill in the Supabase and webhook values in `.env.local`:
-
-```bash
-NEXT_PUBLIC_SUPABASE_URL=...
-NEXT_PUBLIC_SUPABASE_ANON_KEY=...
-SUPABASE_SERVICE_ROLE_KEY=...
-AWARENESS_ENGINE_WEBHOOK_SECRET=...
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
-```
-
-Run the development server:
-
-```bash
 npm run dev
 ```
 
-Open `http://localhost:3000`.
+For a no-hardware UI walkthrough, set `ECOP_DEMO_MODE=true` in `.env.local`. The browser opens at `http://localhost:3000`.
 
-## Supabase Setup
-
-The initial database schema lives in:
-
-```text
-supabase/migrations/0001_init.sql
-```
-
-Seed data lives in:
-
-```text
-supabase/seed.sql
-```
-
-The schema creates profiles, bins, sessions, disposals, transactions, rewards, redemptions, achievements, a leaderboard view, row-level security policies, and the `award_points_for_session` function used by the Awareness Engine webhook.
-
-## Scripts
+Run the release checks:
 
 ```bash
-npm run dev
-npm run build
-npm run start
+npm run typecheck
 npm run lint
 npm run test
-npm run test:watch
-npm run typecheck
+npm run build
+npx playwright test
 ```
 
-## API Routes
+The browser suite expects a local app at `http://localhost:3100`; the exact tested command is in [the test report](docs/release/TEST_REPORT.md). The companion’s simulation tests need its test dependencies as described in [the deployment guide](docs/release/DEPLOYMENT.md).
 
-- `POST /api/session/start` - starts a pending disposal session for a bin.
-- `POST /api/disposal/verify` - HMAC-protected endpoint called by the Awareness Engine.
-- `POST /api/disposal-success` - demo/local disposal award endpoint.
-- `GET /api/dashboard` - dashboard data.
-- `GET /api/leaderboard` - leaderboard data.
-- `GET /api/rewards` - reward catalogue.
-- `POST /api/reward/redeem` - redeem a reward with Eco Points.
+## Production deployment
 
-## Awareness Engine Integration
+Read [the deployment guide](docs/release/DEPLOYMENT.md) before connecting a Supabase project or edge device. Apply migrations in order:
 
-EcoP expects the Awareness Engine to call:
+1. `supabase/migrations/0001_init.sql`
+2. `supabase/migrations/0002_ecop_2.sql`
+3. `supabase/migrations/0003_reward_fulfillment.sql`
+4. `supabase/seed.sql` only if its sample bins and rewards are appropriate for the environment.
 
-```text
-POST /api/disposal/verify
-```
+Do not apply migrations, provision secrets, send mail, deploy or enable stations directly from this repository without change approval. The application has not modified a production service.
 
-The request body contains either a `sessionId` or `binId`, a `result`, a confidence score, and a timestamp. The raw JSON body must be signed with `AWARENESS_ENGINE_WEBHOOK_SECRET` and sent in the `X-Signature` header.
+## Key routes
 
-For the matching computer vision service, see the companion repository:
+- `POST /api/session/start` starts an authenticated station session.
+- `POST /api/disposal/verify` and `POST /api/refill/verify` receive signed v2 edge evidence.
+- `POST /api/device/session` lets a signed device discover only its bin’s current pending session before it tracks an object.
+- `GET/POST /api/impact` reads evidence and handles appeals, reviews and batch actions.
+- `POST /api/reward/redeem` and `POST /api/reward/resolve` create and resolve auditable reward receipts.
 
-```text
-https://github.com/Afnpratham/Awareness-Engine
-```
+The v2 device contract is implemented in `src/lib/device-gateway.ts` and the companion publisher at `companion/awareness-engine/awareness_engine/integration/ecop_webhook.py`. It replaces the prior bin-only webhook convention.
 
-The detailed integration contract is documented in `docs/spec/13-awareness-engine-integration.md`.
+## Documentation
 
-## Project Structure
+- [Deployment guide](docs/release/DEPLOYMENT.md)
+- [Test report](docs/release/TEST_REPORT.md)
+- [Model evaluation and benchmark gate](docs/release/MODEL_EVALUATION.md)
+- [Release notes](docs/release/RELEASE_NOTES.md)
+- [Initial audit/work log](docs/release/WORKLOG.md)
 
-```text
-src/app          Next.js pages, layouts, and API routes
-src/components   Shared UI, layout, and landing/dashboard components
-src/lib          Validation, Supabase clients, HMAC helpers, demo store, utilities
-src/types        Database types
-supabase         SQL migration and seed data
-docs/spec        Product and system specification
-data             Local demo-store state
-```
-
-## Notes
-
-- `.env.local`, build output, local caches, and `node_modules` are intentionally ignored.
-- `data/demo-store.json` is included so the app can show a working demo path without a live Supabase session.
-- Real point awards should go through `POST /api/disposal/verify`; the direct demo endpoint is for local demos and hardware integration experiments.
+`docs/spec` captures the earlier product planning material. The release docs and the code/migrations are authoritative where the older planning specification differs.

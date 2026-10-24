@@ -1,7 +1,12 @@
+import { isDemoMode } from "@/lib/runtime";
+import { authenticated, routeError } from "@/lib/http";
 import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { apiError, internalErrorResponse } from "@/lib/api-error";
-import { buildDemoDashboardPayload, getDemoDashboardPayload } from "@/lib/demo-store";
+import {
+  buildDemoDashboardPayload,
+  getDemoDashboardPayload,
+} from "@/lib/demo-store";
 import type {
   ProfileRow,
   TransactionRow,
@@ -19,20 +24,12 @@ import type {
  */
 export async function GET() {
   try {
-    let supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>;
-    try {
-      supabase = await createSupabaseServerClient();
-    } catch {
-      return NextResponse.json(await getDemoDashboardPayload());
-    }
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json(await getDemoDashboardPayload());
-    }
+    if (isDemoMode())
+      return NextResponse.json({
+        ...(await getDemoDashboardPayload()),
+        mode: "simulation",
+      });
+    const { db: supabase, user } = await authenticated();
 
     // Profile
     const profileResult = await supabase
@@ -43,7 +40,7 @@ export async function GET() {
     const profile = profileResult.data as ProfileRow | null;
 
     if (profileResult.error || !profile) {
-      return NextResponse.json(await getDemoDashboardPayload());
+      throw profileResult.error ?? new Error("Profile unavailable");
     }
 
     // Stats
@@ -120,6 +117,15 @@ export async function GET() {
       }
     }
 
+    for (const result of [
+      txResult,
+      uaResult,
+      achResult,
+      sessResult,
+      rankResult,
+      weeklyResult,
+    ])
+      if (result.error) throw result.error;
     const payload = {
       profile,
       user: {
@@ -169,10 +175,6 @@ export async function GET() {
 
     return NextResponse.json(payload);
   } catch (error) {
-    try {
-      return NextResponse.json(await getDemoDashboardPayload());
-    } catch {
-      return internalErrorResponse(error);
-    }
+    return routeError(error);
   }
 }

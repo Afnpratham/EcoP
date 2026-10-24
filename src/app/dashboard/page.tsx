@@ -52,7 +52,10 @@ interface DashboardData {
     rank: number | null;
   };
   recentTransactions: TransactionRow[];
-  achievements: (AchievementRow & { earned: boolean; earnedAt: string | null })[];
+  achievements: (AchievementRow & {
+    earned: boolean;
+    earnedAt: string | null;
+  })[];
   recentSessions: {
     id: string;
     bin_id: string;
@@ -77,7 +80,7 @@ export default function DashboardPage() {
   const { data, isLoading, error, refetch } = useQuery<DashboardData>({
     queryKey: ["dashboard"],
     queryFn: () => apiFetch<DashboardData>("/api/dashboard"),
-    refetchInterval: 1500,
+    refetchInterval: 15000,
     retry: 1,
     staleTime: 500,
   });
@@ -92,7 +95,7 @@ export default function DashboardPage() {
 
     if (previousPoints !== null && nextPoints > previousPoints) {
       toast.success(
-        `Bottle disposed correctly! +${nextPoints - previousPoints} Eco Points added.`,
+        `Balance updated: +${nextPoints - previousPoints} Eco Points added.`,
       );
     }
   }, [data]);
@@ -172,13 +175,18 @@ export default function DashboardPage() {
             {weeklyPoints.length > 0 ? (
               <ResponsiveContainer width="100%" height={240}>
                 <BarChart data={weeklyPoints}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="hsl(var(--border))"
+                  />
                   <XAxis
                     dataKey="date"
                     tick={{ fontSize: 11 }}
                     tickFormatter={(v: string) => {
                       const d = new Date(v + "T00:00:00");
-                      return d.toLocaleDateString("en-US", { weekday: "short" });
+                      return d.toLocaleDateString("en-US", {
+                        weekday: "short",
+                      });
                     }}
                   />
                   <YAxis tick={{ fontSize: 11 }} />
@@ -216,16 +224,16 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             {achievements.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No achievements yet.</p>
+              <p className="text-sm text-muted-foreground">
+                No achievements yet.
+              </p>
             ) : (
               <div className="grid grid-cols-3 gap-3">
                 {achievements.map((a) => (
                   <div
                     key={a.id}
                     className={`flex flex-col items-center gap-1 rounded-lg border p-3 text-center transition-opacity ${
-                      a.earned
-                        ? "border-primary/30 bg-primary/5"
-                        : "opacity-40"
+                      a.earned ? "border-primary/30 bg-primary/5" : "opacity-40"
                     }`}
                     title={a.description}
                   >
@@ -308,7 +316,9 @@ export default function DashboardPage() {
             <div>
               <p className="text-sm text-muted-foreground">Available balance</p>
               <p className="font-display text-3xl font-bold text-primary">
-                {(redemption?.availablePoints ?? stats.ecoPoints).toLocaleString()}
+                {(
+                  redemption?.availablePoints ?? stats.ecoPoints
+                ).toLocaleString()}
                 <span className="ml-1 text-sm font-medium text-muted-foreground">
                   pts
                 </span>
@@ -322,7 +332,13 @@ export default function DashboardPage() {
                     className="flex items-center justify-between rounded-lg border border-border bg-card/80 px-3 py-2"
                   >
                     <span className="text-sm font-medium">{reward.name}</span>
-                    <Badge variant={stats.ecoPoints >= reward.cost_points ? "success" : "secondary"}>
+                    <Badge
+                      variant={
+                        stats.ecoPoints >= reward.cost_points
+                          ? "success"
+                          : "secondary"
+                      }
+                    >
                       {reward.cost_points} pts
                     </Badge>
                   </div>
@@ -392,8 +408,9 @@ export default function DashboardPage() {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-1">
               <p className="text-sm text-muted-foreground">
-                Walk up to any EcoP smart bin, scan the QR code with your phone camera,
-                and dispose responsibly. Points are credited instantly after AI verification.
+                Walk up to any EcoP smart bin, scan the QR code with your phone
+                camera, and dispose responsibly. Points are credited instantly
+                after AI verification.
               </p>
             </div>
             <div className="flex gap-2">

@@ -1,97 +1,90 @@
-"use client";
-
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { ArrowRight, Leaf, Sparkles } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { ROUTES } from "@/lib/constants";
-
+import {
+  ArrowUpRight,
+  ScanLine,
+  Leaf,
+  ArrowDown,
+  Check,
+  Recycle,
+  Droplets,
+} from "lucide-react";
 export function LandingHero() {
   return (
-    <section className="relative overflow-hidden marketing-radial">
-      {/* Background decorative orbs */}
-      <div className="pointer-events-none absolute -top-24 left-1/2 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-primary/10 blur-[120px]" />
-      <div className="pointer-events-none absolute -bottom-32 right-0 h-[400px] w-[400px] rounded-full bg-primary/5 blur-[100px]" />
-
-      <div className="container relative flex min-h-[85vh] flex-col items-center justify-center py-24 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <div className="mx-auto mb-6 flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm font-medium text-primary">
-            <Sparkles className="h-4 w-4" />
-            AI-Powered Campus Sustainability
-          </div>
-        </motion.div>
-
-        <motion.h1
-          className="font-display text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl"
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-        >
-          Rewarding Sustainable
+    <section className="container grid gap-12 py-14 lg:grid-cols-[1.1fr_1fr] lg:items-center lg:py-24">
+      <div>
+        <div className="mb-7 inline-flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-medium">
+          <span className="h-2 w-2 rounded-full bg-primary" /> A better habit. A
+          lighter footprint.
+        </div>
+        <h1 className="max-w-2xl font-display text-6xl font-semibold leading-[1.03] tracking-[-.055em] sm:text-7xl lg:text-[5.5rem]">
+          Small actions.
           <br />
-          <span className="bg-gradient-to-r from-primary to-emerald-400 bg-clip-text text-transparent">
-            Behaviour Through AI
+          <span className="text-primary">Real possibility.</span>
+        </h1>
+        <p className="mt-7 max-w-lg text-lg leading-relaxed text-muted-foreground">
+          Recycle with confidence. Refill with purpose. Turn everyday choices
+          into rewards, with a clear record of what happens next.
+        </p>
+        <div className="mt-8 flex flex-wrap gap-3">
+          <Link
+            href="/stations"
+            className="inline-flex items-center gap-8 rounded-full bg-primary px-6 py-4 font-semibold text-primary-foreground"
+          >
+            Find a station
+            <ArrowUpRight size={20} />
+          </Link>
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-3 rounded-full border px-6 py-4 font-medium"
+          >
+            Your impact
+            <ArrowUpRight size={18} />
+          </Link>
+        </div>
+        <p className="mt-8 flex items-center gap-2 text-xs text-muted-foreground">
+          <ScanLine size={15} /> Session-based attribution. No face recognition.
+        </p>
+      </div>
+      <div className="relative rounded-[2rem] bg-[#123e32] p-6 text-white sm:p-9">
+        <div className="flex items-center justify-between">
+          <span className="text-xs uppercase tracking-[.2em] text-emerald-200">
+            The circular everyday
           </span>
-        </motion.h1>
-
-        <motion.p
-          className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground sm:text-xl"
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-        >
-          Scan a smart bin, dispose responsibly, and earn redeemable Eco Points.
-          EcoP uses computer vision to verify every disposal — no cheating, no
-          waste.
-        </motion.p>
-
-        <motion.div
-          className="mt-10 flex flex-col items-center gap-4 sm:flex-row"
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <Button asChild size="lg" className="gap-2 shadow-glow">
-            <Link href={ROUTES.REGISTER}>
-              <Leaf className="h-5 w-5" />
-              Get Started Free
-            </Link>
-          </Button>
-          <Button asChild variant="outline" size="lg" className="gap-2">
-            <Link href="#how-it-works">
-              See How It Works
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </Button>
-        </motion.div>
-
-        {/* Floating stats pills */}
-        <motion.div
-          className="mt-16 flex flex-wrap justify-center gap-6"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.5 }}
-        >
-          {[
-            { label: "Bottles Recycled", value: "12,847+" },
-            { label: "Active Users", value: "1,200+" },
-            { label: "CO₂ Saved", value: "694 kg" },
-          ].map((stat) => (
-            <div
-              key={stat.label}
-              className="glass rounded-xl border border-border/60 px-6 py-3 text-center"
-            >
-              <p className="font-display text-xl font-bold text-foreground">
-                {stat.value}
-              </p>
-              <p className="text-xs text-muted-foreground">{stat.label}</p>
+          <Leaf size={22} className="text-[#d4ed9a]" />
+        </div>
+        <div className="my-9 flex items-center justify-center gap-5">
+          <div className="relative flex h-64 w-40 flex-col items-center justify-center rounded-[3rem] border border-white/20 bg-white/10">
+            <div className="absolute -top-3 h-6 w-16 rounded-t-xl bg-[#d4ed9a]" />
+            <Recycle size={48} strokeWidth={1.2} className="text-[#d4ed9a]" />
+            <span className="mt-4 text-xs uppercase tracking-[.2em]">
+              One more life
+            </span>
+            <div className="absolute bottom-7 h-px w-20 bg-white/20" />
+          </div>
+          <div className="space-y-4">
+            <div className="rounded-2xl bg-[#d4ed9a] p-5 text-[#173e31]">
+              <Droplets size={24} />
+              <p className="mt-6 text-xl font-semibold">Reuse first.</p>
+              <p className="mt-1 text-xs">Less to throw away.</p>
             </div>
-          ))}
-        </motion.div>
+            <div className="rounded-2xl border border-white/15 p-4">
+              <div className="flex items-center gap-2 text-sm">
+                <Check size={17} className="text-[#d4ed9a]" /> Evidence matters
+              </div>
+              <p className="mt-2 max-w-32 text-xs leading-relaxed text-emerald-100/80">
+                A receipt for the action.
+                <br />A path for the material.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center justify-between border-t border-white/15 pt-5 text-sm text-emerald-100">
+          <span>Dispose → verify → collect → accept</span>
+          <ArrowDown size={18} />
+        </div>
+        <div className="absolute -bottom-4 right-8 rounded-full bg-[#eacbb5] px-5 py-2.5 text-xs font-semibold text-[#403329]">
+          Designed for progress, every day.
+        </div>
       </div>
     </section>
   );
