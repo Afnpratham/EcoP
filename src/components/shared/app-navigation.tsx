@@ -8,6 +8,7 @@ import {
   Gift,
   Trophy,
   UserRound,
+  Radio,
 } from "lucide-react";
 const links = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
@@ -15,6 +16,7 @@ const links = [
   { href: "/impact", label: "Impact & receipts", icon: ScanLine },
   { href: "/rewards", label: "Rewards", icon: Gift },
   { href: "/leaderboard", label: "Community", icon: Trophy },
+  { href: "/demo/live", label: "Live AI Demo", icon: Radio },
   { href: "/profile", label: "Profile", icon: UserRound },
 ];
 export function AppNavigation() {

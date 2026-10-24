@@ -9,9 +9,13 @@ import { isDemoMode } from "@/lib/runtime";
 export async function Navbar() {
   const profile = await getServerProfile().catch(() => null);
   const demo = isDemoMode();
+  const liveCameraObservation =
+    demo &&
+    process.env.ECOP_LIVE_DEMO_LOCAL === "true" &&
+    process.env.NODE_ENV !== "production";
   return (
     <>
-      <RuntimeBanner demo={demo} />
+      <RuntimeBanner demo={demo} liveCameraObservation={liveCameraObservation} />
       <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-xl">
         <div className="container flex h-20 items-center justify-between gap-3">
           <Logo />

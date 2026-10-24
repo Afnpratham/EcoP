@@ -9,6 +9,7 @@ const pages = [
   "/profile",
   "/impact",
   "/lab",
+  "/demo/live",
   "/login",
   "/register",
   "/forgot-password",
@@ -35,6 +36,7 @@ test("mobile navigation and pages fit the viewport", async ({ page }) => {
     "/rewards",
     "/impact",
     "/lab",
+    "/demo/live",
     "/login",
     "/register",
   ]) {

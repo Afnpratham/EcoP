@@ -27,6 +27,17 @@ npm run dev
 
 For a no-hardware UI walkthrough, set `ECOP_DEMO_MODE=true` in `.env.local`. The browser opens at `http://localhost:3000`.
 
+## Local live AI demonstration
+
+The protected [Live AI Demo](/demo/live) is separate from `/lab`: it streams one real, local Awareness Engine camera pipeline and displays its actual YOLO11n/ByteTrack overlays and events. It is observation-only. It does not call a reward API, create a QR session, or change a balance.
+
+1. Provision the private companion locally and set its `ENGINE_API_KEY` and `MODEL_PATH` in `companion/awareness-engine/.env`.
+2. Put the same API key in the ignored root `.env.local` as `ECOP_AWARENESS_ENGINE_API_KEY`, set `ECOP_AWARENESS_ENGINE_URL=http://127.0.0.1:8000`, and set `ECOP_LIVE_DEMO_LOCAL=true` only for local development.
+3. Start the engine on loopback with `cd companion/awareness-engine && .venv/bin/python -m uvicorn awareness_engine.api.main:app --host 127.0.0.1 --port 8000`.
+4. Start EcoP with `ECOP_DEMO_MODE=true npm run dev -- --port 3100`, then open `http://localhost:3100/demo/live`.
+
+Only the Next.js server reads the engine API key. Outside that explicit local mode, live-demo routes require an authenticated EcoP administrator. A registered station's signed v2 publisher remains a separate pathway: it binds a track to a QR session, retries via its SQLite outbox, and lets the EcoP database adjudicate before any credit or review update.
+
 Run the release checks:
 
 ```bash

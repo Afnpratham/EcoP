@@ -7,6 +7,7 @@ const protectedPaths = [
   "/rewards",
   "/leaderboard",
   "/impact",
+  "/demo",
 ];
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });

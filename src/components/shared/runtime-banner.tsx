@@ -1,7 +1,13 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-export function RuntimeBanner({ demo }: { demo: boolean }) {
+export function RuntimeBanner({
+  demo,
+  liveCameraObservation = false,
+}: {
+  demo: boolean;
+  liveCameraObservation?: boolean;
+}) {
   const [offline, setOffline] = useState(false);
   useEffect(() => {
     const update = () => setOffline(!navigator.onLine);
@@ -17,8 +23,9 @@ export function RuntimeBanner({ demo }: { demo: boolean }) {
     <>
       {demo && (
         <div className="bg-amber-100 px-4 py-2 text-center text-xs font-medium text-amber-950">
-          Simulation workspace · sample data and points · no hardware
+          Simulation workspace · sample data and points · no reward or hardware
           verification.{" "}
+          {liveCameraObservation && "Local camera observation is available in the Live AI Demo. "}
           <Link href="/lab" className="underline underline-offset-2">
             Open lab
           </Link>
